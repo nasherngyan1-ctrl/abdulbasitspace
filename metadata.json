@@ -1,0 +1,6 @@
+{
+  "name": "ABDULBASIT SPACE",
+  "description": "ئەپێکی پێشکەوتووی کوردی بۆ دەستکاریکردنی وێنە و ڤیدیۆ، زیرەکی دەستکرد، دروستکردنی ئەپ و وێبسایت، توێژینەوە و بەڕێوەبردنی فایل",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

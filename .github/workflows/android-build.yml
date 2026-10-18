@@ -1,0 +1,70 @@
+name: ABDULBASIT SPACE Android Build & Test CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build & Test Android App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Prepare Environment File
+        run: |
+          if [ -f .env.example ] && [ ! -f .env ]; then
+            cp .env.example .env
+          fi
+
+      - name: Ensure Gradle Wrapper Executable
+        run: |
+          if [ ! -f gradlew ]; then
+            echo "Generating gradle wrapper..."
+            gradle wrapper || true
+          fi
+          if [ -f gradlew ]; then
+            chmod +x gradlew
+          fi
+
+      - name: Run Unit & Robolectric Tests
+        run: |
+          if [ -f gradlew ]; then
+            ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
+          else
+            gradle :app:testDebugUnitTest --no-daemon --stacktrace
+          fi
+
+      - name: Build Debug APK
+        run: |
+          if [ -f gradlew ]; then
+            ./gradlew :app:assembleDebug --no-daemon --stacktrace
+          else
+            gradle :app:assembleDebug --no-daemon --stacktrace
+          fi
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ABDULBASIT-SPACE-Debug-APK
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 14
+          if-no-files-found: error

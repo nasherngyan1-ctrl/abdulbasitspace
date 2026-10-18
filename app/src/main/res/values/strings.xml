@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ABDULBASIT SPACE</string>
+    <string name="nav_home">سەرەکی</string>
+    <string name="nav_ai_chat">گفتوگۆی AI</string>
+    <string name="nav_image_editor">دەستکاری وێنە</string>
+    <string name="nav_video_editor">دەستکاری ڤیدیۆ</string>
+    <string name="nav_projects">پڕۆژەکان</string>
+    <string name="nav_settings">ڕێکخستنەکان</string>
+</resources>
