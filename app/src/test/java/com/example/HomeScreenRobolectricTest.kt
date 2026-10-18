@@ -33,6 +33,7 @@ class HomeScreenRobolectricTest {
                 )
             }
         }
+        composeTestRule.waitForIdle()
 
         // Verify Brand Title node exists
         composeTestRule.onAllNodesWithText("ABDULBASIT SPACE")[0].assertIsDisplayed()
@@ -42,10 +43,12 @@ class HomeScreenRobolectricTest {
 
         // Test Click on AI Chat Tool
         composeTestRule.onNodeWithTag("tool_card_ai_chat").performClick()
+        composeTestRule.waitForIdle()
         assertEquals("ai_chat", navigatedTo)
 
         // Test Click on Image Editor Tool
         composeTestRule.onNodeWithTag("tool_card_image_editor").performClick()
+        composeTestRule.waitForIdle()
         assertEquals("image_editor", navigatedTo)
     }
 
@@ -59,6 +62,7 @@ class HomeScreenRobolectricTest {
                 )
             }
         }
+        composeTestRule.waitForIdle()
 
         // Verify Offline Badge exists
         composeTestRule.onAllNodesWithText("ئۆفڵاین")[0].assertIsDisplayed()

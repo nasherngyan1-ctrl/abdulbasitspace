@@ -19,47 +19,53 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
-          cache: gradle
+
+      - name: Accept Android SDK Licenses
+        run: |
+          SDK_DIR="${ANDROID_SDK_ROOT:-$ANDROID_HOME}"
+          mkdir -p "$SDK_DIR/licenses"
+          printf "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$SDK_DIR/licenses/android-sdk-license"
+          printf "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$SDK_DIR/licenses/android-sdk-preview-license"
+          printf "\n601085b94cd77f0b54ff86406957099ebe79c4d6" > "$SDK_DIR/licenses/android-googletv-license"
+          printf "\nceff83576aac4f7f37cb98fe189e9fb3c49d3b81" > "$SDK_DIR/licenses/android-googlexr-license"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Prepare Environment File
+      - name: Prepare Environment & Debug Keystore
         run: |
           if [ -f .env.example ] && [ ! -f .env ]; then
             cp .env.example .env
           fi
+          if [ ! -f debug.keystore ]; then
+            keytool -genkeypair -v \
+              -keystore debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
 
       - name: Ensure Gradle Wrapper Executable
         run: |
-          if [ ! -f gradlew ]; then
-            echo "Generating gradle wrapper..."
-            gradle wrapper || true
-          fi
-          if [ -f gradlew ]; then
-            chmod +x gradlew
-          fi
+          chmod +x gradlew
+          ./gradlew --version
 
       - name: Run Unit & Robolectric Tests
         run: |
-          if [ -f gradlew ]; then
-            ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
-          else
-            gradle :app:testDebugUnitTest --no-daemon --stacktrace
-          fi
+          ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
 
       - name: Build Debug APK
         run: |
-          if [ -f gradlew ]; then
-            ./gradlew :app:assembleDebug --no-daemon --stacktrace
-          else
-            gradle :app:assembleDebug --no-daemon --stacktrace
-          fi
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
